@@ -1,9 +1,11 @@
 import FavoriteMovieSearchPresenter from "../src/scripts/views/pages/liked-movies/favorite-movie-search-presenter";
 import FavoriteMovieIdb from "../src/scripts/data/favorite-movie-idb";
+import FavoriteMovieSearchView from "../src/scripts/views/pages/liked-movies/favorite-movie-search-view";
 
 describe("Searching movies", () => {
   let presenter;
   let favoriteMovies;
+  let view;
 
   const searchMovies = (query) => {
     const queryElement = document.getElementById("query");
@@ -12,21 +14,15 @@ describe("Searching movies", () => {
   };
 
   const setMovieSearchContainer = () => {
-    document.body.innerHTML = `
-        <div id="movie-search-container">
-            <input id="query" type="text">
-            <div class="movie-result-container">
-                <ul class="movies">
-                </ul>
-            </div>
-        </div>
-        `;
+    view = new FavoriteMovieSearchView();
+    document.body.innerHTML = view.getTemplate();
   };
 
   const constructPresenter = () => {
     favoriteMovies = spyOnAllFunctions(FavoriteMovieIdb);
     presenter = new FavoriteMovieSearchPresenter({
       favoriteMovies,
+      view,
     });
   };
 
@@ -63,6 +59,18 @@ describe("Searching movies", () => {
         },
       ]);
       expect(document.querySelectorAll(".movie").length).toEqual(2);
+    });
+
+    it("should show the title of the found movies", () => {
+      presenter._showFoundMovies([
+        {
+          id: 1,
+          title: "Satu",
+        },
+      ]);
+      expect(
+        document.querySelectorAll(".movie__title").item(0).textContent
+      ).toEqual("Satu");
     });
 
     it("should show the title of the found movies", () => {
@@ -164,7 +172,15 @@ describe("Searching movies", () => {
   describe("When query is empty", () => {
     it("should capture the query as empty", () => {
       searchMovies(" ");
+      expect(presenter.latestQuery.length).toEqual(0);
 
+      searchMovies("    ");
+      expect(presenter.latestQuery.length).toEqual(0);
+
+      searchMovies("");
+      expect(presenter.latestQuery.length).toEqual(0);
+
+      searchMovies("\t");
       expect(presenter.latestQuery.length).toEqual(0);
     });
 
@@ -198,7 +214,9 @@ describe("Searching movies", () => {
           expect(document.querySelectorAll(".movie").length).toEqual(0);
           done();
         });
+
       favoriteMovies.searchMovies.withArgs("film a").and.returnValues([]);
+
       searchMovies("film a");
     });
   });
