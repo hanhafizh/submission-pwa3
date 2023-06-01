@@ -1,51 +1,36 @@
-import {
-  createLikeMovieButtonTemplate,
-  createUnlikeMovieButtonTemplate,
-} from "../views/templates/template-creator";
-
-const LikeButtonPresenter = {
-  async init({ likeButtonContainer, favoriteMovies, movie }) {
-    this._likeButtonContainer = likeButtonContainer;
-    this._movie = movie;
+class FavoriteMovieSearchPresenter {
+  constructor({ favoriteMovies, view }) {
+    this._view = view;
+    this._listenToSearchRequestByUser();
     this._favoriteMovies = favoriteMovies;
+  }
 
-    await this._renderButton();
-  },
+  _listenToSearchRequestByUser() {
+    this._view.runWhenUserIsSearching((latestQuery) => {
+      this._searchMovies(latestQuery);
+    });
+  }
 
-  async _renderButton() {
-    const { id } = this._movie;
+  async _searchMovies(latestQuery) {
+    this._latestQuery = latestQuery.trim();
 
-    if (await this._isMovieExist(id)) {
-      this._renderLiked();
+    let foundMovies;
+    if (this.latestQuery.length > 0) {
+      foundMovies = await this._favoriteMovies.searchMovies(this.latestQuery);
     } else {
-      this._renderLike();
+      foundMovies = await this._favoriteMovies.getAllMovies();
     }
-  },
 
-  async _isMovieExist(id) {
-    const movie = await this._favoriteMovies.getMovie(id);
-    return !!movie;
-  },
+    this._showFoundMovies(foundMovies);
+  }
 
-  _renderLike() {
-    this._likeButtonContainer.innerHTML = createLikeMovieButtonTemplate();
+  _showFoundMovies(movies) {
+    this._view.showMovies(movies);
+  }
 
-    const likeButton = document.querySelector("#likeButton");
-    likeButton.addEventListener("click", async () => {
-      await this._favoriteMovies.putMovie(this._movie);
-      this._renderButton();
-    });
-  },
+  get latestQuery() {
+    return this._latestQuery;
+  }
+}
 
-  _renderLiked() {
-    this._likeButtonContainer.innerHTML = createUnlikeMovieButtonTemplate();
-
-    const likeButton = document.querySelector("#likeButton");
-    likeButton.addEventListener("click", async () => {
-      await this._favoriteMovies.deleteMovie(this._movie.id);
-      this._renderButton();
-    });
-  },
-};
-
-export default LikeButtonPresenter;
+export default FavoriteMovieSearchPresenter;
