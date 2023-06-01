@@ -1,4 +1,4 @@
-import { createMovieItemTemplate } from "../../templates/template-creator";
+import { createRestaurantListTemplate } from "../../templates/template-creator";
 
 class FavoriteMovieSearchView {
   getTemplate() {
@@ -27,7 +27,7 @@ class FavoriteMovieSearchView {
     let html;
     if (movies.length) {
       html = movies.reduce(
-        (carry, movie) => carry.concat(createMovieItemTemplate(movie)),
+        (carry, movie) => carry.concat(createRestaurantListTemplate(movie)),
         ""
       );
     } else {
