@@ -14,37 +14,32 @@ const FavoriteMovieIdb = {
     if (!id) {
       return;
     }
+
     return (await dbPromise).get(OBJECT_STORE_NAME, id);
   },
-
   async getAllMovies() {
     return (await dbPromise).getAll(OBJECT_STORE_NAME);
   },
-
   async putMovie(movie) {
-    // eslint-disable-next-line no-prototype-builtins
     if (!movie.hasOwnProperty("id")) {
       return;
     }
-    // eslint-disable-next-line consistent-return
+
     return (await dbPromise).put(OBJECT_STORE_NAME, movie);
   },
-
   async deleteMovie(id) {
     return (await dbPromise).delete(OBJECT_STORE_NAME, id);
   },
+  async searchMovies(query) {
+    return (await this.getAllMovies()).filter((movie) => {
+      const loweredCaseMovieTitle = (movie.title || "-").toLowerCase();
+      const jammedMovieTitle = loweredCaseMovieTitle.replace(/\s/g, "");
 
-  async _searchMovies(latestQuery) {
-    this._latestQuery = latestQuery.trim();
+      const loweredCaseQuery = query.toLowerCase();
+      const jammedQuery = loweredCaseQuery.replace(/\s/g, "");
 
-    let foundMovies;
-    if (this.latestQuery.length > 0) {
-      foundMovies = await this._favoriteMovies.searchMovies(this.latestQuery);
-    } else {
-      foundMovies = await this._favoriteMovies.getAllMovies();
-    }
-
-    this._showFoundMovies(foundMovies);
+      return jammedMovieTitle.indexOf(jammedQuery) !== -1;
+    });
   },
 };
 

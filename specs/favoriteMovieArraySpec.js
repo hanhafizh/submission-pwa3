@@ -8,7 +8,7 @@ const FavoriteMovieArray = {
       return;
     }
 
-    return favoriteMovies.find((movie) => movie.id == id);
+    return favoriteMovies.find((movie) => movie.id === id);
   },
 
   getAllMovies() {
@@ -31,7 +31,19 @@ const FavoriteMovieArray = {
   deleteMovie(id) {
     // cara boros menghapus film dengan meng-copy film yang ada
     // kecuali film dengan id == id
-    favoriteMovies = favoriteMovies.filter((movie) => movie.id != id);
+    favoriteMovies = favoriteMovies.filter((movie) => movie.id !== id);
+  },
+
+  searchMovies(query) {
+    return this.getAllMovies().filter((movie) => {
+      const loweredCaseMovieTitle = (movie.title || "-").toLowerCase();
+      const jammedMovieTitle = loweredCaseMovieTitle.replace(/\s/g, "");
+
+      const loweredCaseQuery = query.toLowerCase();
+      const jammedQuery = loweredCaseQuery.replace(/\s/g, "");
+
+      return jammedMovieTitle.indexOf(jammedQuery) !== -1;
+    });
   },
 };
 
