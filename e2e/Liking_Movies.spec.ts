@@ -16,9 +16,9 @@ Scenario('liking one movie', async ({ I }) => {
    
     I.amOnPage('/');
    
-    I.seeElement('.movie__title a');
+    I.seeElement('.restaurant-list_content a');
    
-    const firstFilm = locate('.movie__title a').first();
+    const firstFilm = locate('.restaurant-list_content a').first();
     const firstFilmTitle = await I.grabTextFrom(firstFilm);
     I.click(firstFilm);
    
